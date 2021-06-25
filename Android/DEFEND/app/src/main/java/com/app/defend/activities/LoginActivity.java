@@ -66,7 +66,8 @@ public class LoginActivity extends AppCompatActivity {
 					Toast.makeText(LoginActivity.this, "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
 				} else {
 					String phone = "+91" + phoneno.getEditText().getText().toString();
-					sendVerificationCode(phone);
+					//sendVerificationCode(phone);
+					createNewUser();  //for testing disabled authentication
 				}
 			} else {
 				Log.e("123", "verify otp");
@@ -158,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
 		user.setName("Omkar");
 		user.setPhoneNo(phoneno.getEditText().getText().toString());
 		user.setPublicKey(publicKey);
-		Log.e("123", "till this point");
+
 		FirebaseFirestore db = FirebaseFirestore.getInstance();
 		db.collection("Users").document(user.getUID()).set(user)
 				.addOnSuccessListener(new OnSuccessListener<Void>() {
