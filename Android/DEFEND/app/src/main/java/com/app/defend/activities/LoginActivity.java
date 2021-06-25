@@ -142,6 +142,15 @@ public class LoginActivity extends AppCompatActivity {
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public void createNewUser() {
+
+		if (Utils.getPrivateKey(this) != null) {
+			Intent i = new Intent(LoginActivity.this, ChatsDashboardActivity.class);
+			startActivity(i);
+			finish();
+			return;
+		}
+
+
 		Log.e("123", "creating new user");
 		String publicKey = null;
 		String privateKey = null;
