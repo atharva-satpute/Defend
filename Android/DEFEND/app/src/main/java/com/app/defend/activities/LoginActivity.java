@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 	private String verificationId;
 	private String countryCode;
 
+
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +131,7 @@ public class LoginActivity extends AppCompatActivity {
 				.build();
 		PhoneAuthProvider.verifyPhoneNumber(options);
 	}
+
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	private void signInWithCredential(PhoneAuthCredential credential) {

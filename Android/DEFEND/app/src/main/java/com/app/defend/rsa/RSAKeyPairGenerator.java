@@ -31,5 +31,6 @@ public class RSAKeyPairGenerator {
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public String getPublicKey() {
 		return Base64.getEncoder().encodeToString(privateKey.getEncoded());
+
 	}
 }
