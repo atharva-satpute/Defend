@@ -39,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 	PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
 	boolean first = false;
 	private String verificationId;
+	private String countryCode;
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
@@ -59,13 +60,15 @@ public class LoginActivity extends AppCompatActivity {
 		otp = findViewById(R.id.otp);
 
 
+
 		verify.setOnClickListener(v -> {
 			if (!first) {
 				Log.e("123", "send otp");
 				if (TextUtils.isEmpty(phoneno.getEditText().getText().toString())) {
 					Toast.makeText(LoginActivity.this, "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
 				} else {
-					String phone = "+91" + phoneno.getEditText().getText().toString();
+					// Adding country code with plus sign
+					String phone = "+" + findViewById(R.id.ccp) + phoneno.getEditText().getText().toString();
 					//sendVerificationCode(phone);
 					createNewUser();  //for testing disabled authentication
 				}
