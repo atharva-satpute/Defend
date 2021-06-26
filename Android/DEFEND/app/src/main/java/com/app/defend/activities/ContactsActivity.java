@@ -62,6 +62,7 @@ public class ContactsActivity extends AppCompatActivity {
 				TextView receiverName = view.findViewById(R.id.name);
 				TextView phoneNumber = view.findViewById(R.id.phone);
 
+				// Sending data to Chat Activity
 				Intent chat = new Intent(ContactsActivity.this, UserChats.class);
 				chat.putExtra("receiver_name", receiverName.getText().toString());
 				chat.putExtra("phone_number", phoneNumber.getText().toString());

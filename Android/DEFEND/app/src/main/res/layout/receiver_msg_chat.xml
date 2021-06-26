@@ -5,34 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
-    android:layout_marginLeft="8dp"
     android:layout_marginTop="16dp">
-
-    <TextView
-        android:id="@+id/chat_date_other"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp"
-        android:text="June 10"
-        android:textColor="#C0C0C0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/chat_user_other"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="John Grady Cole"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/chat_date_other"
-        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_receiver_chat"
@@ -41,9 +14,10 @@
         app:cardBackgroundColor="#eef1f6"
         app:cardCornerRadius="0dp"
         app:cardElevation="0dp"
+        android:layout_marginStart="10dp"
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/chat_user_other"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
 
         <LinearLayout
