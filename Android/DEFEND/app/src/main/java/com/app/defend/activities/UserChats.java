@@ -33,8 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.w3c.dom.Text;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -70,7 +68,10 @@ public class UserChats extends AppCompatActivity {
 		Intent intent = getIntent();
 		String receiverName = intent.getStringExtra("receiver_name");
 		String phoneNumber = intent.getStringExtra("phone_number");
+
 		db = FirebaseFirestore.getInstance();
+
+
 		ll = findViewById(R.id.rvChat);
 		messages = new ArrayList<>();
 		adapter = new Adapter(Utils.getUID(this));
@@ -184,8 +185,12 @@ public class UserChats extends AppCompatActivity {
 			public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
 				List<DocumentSnapshot> val = value.getDocuments();
 				if (val.size() != 0) {
-					Message msg = value.getDocuments().get(0).toObject(Message.class);
-					messages.add(msg);
+					messages.clear();
+					for (DocumentSnapshot doc : val) {
+						Message msg = doc.toObject(Message.class);
+						messages.add(msg);
+					}
+					Collections.sort(messages);
 					adapter.notifyDataSetChanged();
 				}
 			}
@@ -201,6 +206,7 @@ public class UserChats extends AppCompatActivity {
 			super(itemView);
 //			tv = itemView.findViewById(R.id.chattv);
 		}
+
 		abstract void bindMessage(Message message);
 	}
 
@@ -273,7 +279,7 @@ public class UserChats extends AppCompatActivity {
 		@Override
 		void bindMessage(Message message) {
 			try {
-				textMessage.setText(RSAUtils.decrypt(message.getEncryptedText(),Utils.getPrivateKey(UserChats.this)));
+				textMessage.setText(RSAUtils.decrypt(message.getEncryptedText(), Utils.getPrivateKey(UserChats.this)));
 				SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
 				chatTime.setText(sdf.format(message.getDate()));
 			} catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException |
@@ -286,6 +292,7 @@ public class UserChats extends AppCompatActivity {
 	public class OutgoingMessageViewHolder extends TextViewHolder {
 		TextView textMessage;
 		TextView chatTime;
+
 		public OutgoingMessageViewHolder(@NonNull View itemView) {
 			super(itemView);
 			textMessage = itemView.findViewById(R.id.sender_chat);
@@ -294,7 +301,7 @@ public class UserChats extends AppCompatActivity {
 
 		@Override
 		void bindMessage(Message message) {
-			textMessage.setText(Utils.getMessage(message.getUID(),UserChats.this));
+			textMessage.setText(Utils.getMessage(message.getUID(), UserChats.this));
 			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
 			chatTime.setText(sdf.format(message.getDate()));
 		}

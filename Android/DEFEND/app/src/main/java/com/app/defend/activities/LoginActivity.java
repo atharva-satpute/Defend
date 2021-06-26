@@ -15,7 +15,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.app.defend.R;
-
 import com.app.defend.Utils;
 import com.app.defend.model.User;
 import com.app.defend.rsa.RSAKeyPairGenerator;
@@ -30,6 +29,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
@@ -42,9 +42,9 @@ public class LoginActivity extends AppCompatActivity {
 	FirebaseAuth mAuth;
 	PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
 	boolean first = false;
+	FirebaseFirestore db;
 	private String verificationId;
 	private String countryCode;
-
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
@@ -52,7 +52,11 @@ public class LoginActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		mAuth = FirebaseAuth.getInstance();
-
+		FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+				.setPersistenceEnabled(true)
+				.build();
+		db = FirebaseFirestore.getInstance();
+		db.setFirestoreSettings(settings);
 
 		//FirebaseUser user = mAuth.getCurrentUser();
 		//if (user != null) {
@@ -198,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
 		user.setPublicKey(publicKey);
 		Utils.saveUserToSP(user, this);
 
-		FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 		db.collection("Users").document(user.getUID()).set(user)
 				.addOnSuccessListener(new OnSuccessListener<Void>() {
 					@Override

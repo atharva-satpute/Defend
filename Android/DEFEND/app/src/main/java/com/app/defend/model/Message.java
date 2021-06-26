@@ -3,7 +3,7 @@ package com.app.defend.model;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Message {
+public class Message implements Comparable<Message> {
 	String UID, encryptedText, encodings, to, from;
 	ArrayList<Integer> flags;
 	Date date;
@@ -62,5 +62,10 @@ public class Message {
 
 	public void setFlags(ArrayList<Integer> flags) {
 		this.flags = flags;
+	}
+
+	@Override
+	public int compareTo(Message o) {
+		return getDate().compareTo(o.getDate());
 	}
 }
