@@ -32,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity {
@@ -202,7 +203,7 @@ public class LoginActivity extends AppCompatActivity {
 		user.setPublicKey(publicKey);
 		Utils.saveUserToSP(user, this);
 
-
+		user.setChats(new ArrayList<String>());
 		db.collection("Users").document(user.getUID()).set(user)
 				.addOnSuccessListener(new OnSuccessListener<Void>() {
 					@Override

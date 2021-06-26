@@ -1,12 +1,13 @@
 package com.app.defend.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class User {
 
 	String UID, name, phoneNo, publicKey;
 	int reportCount;
+	List<String> chats;
 
 	public String getUID() {
 		return UID;
@@ -47,4 +48,8 @@ public class User {
 	public void setReportCount(int reportCount) {
 		this.reportCount = reportCount;
 	}
+
+	public List<String> getChats() { return chats; }
+
+	public void setChats(ArrayList<String> chats) {this.chats = chats; }
 }

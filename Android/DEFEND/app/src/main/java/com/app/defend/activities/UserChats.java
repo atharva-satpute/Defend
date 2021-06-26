@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -158,6 +160,8 @@ public class UserChats extends AppCompatActivity {
 		uids.add(receiver.getUID());
 		uids.add(Utils.getUID(this));
 		Collections.sort(uids);
+		Log.e("user1", uids.get(0));
+		Log.e("user2", uids.get(1));
 
 		db.collection(uids.get(0) + uids.get(1)).get()
 				.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -169,7 +173,11 @@ public class UserChats extends AppCompatActivity {
 						}
 						adapter.notifyDataSetChanged();
 						setUpListeners();
+
+						db.collection("Users").document(Utils.getUID(UserChats.this)).update("chats", FieldValue.arrayUnion(receiver.getUID()));
+
 					}
+
 				}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception e) {
