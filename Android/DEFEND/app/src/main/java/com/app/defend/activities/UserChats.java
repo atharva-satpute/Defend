@@ -118,9 +118,6 @@ public class UserChats extends AppCompatActivity {
 					.addOnSuccessListener(new OnSuccessListener<Void>() {
 						@Override
 						public void onSuccess(Void aVoid) {
-							//messages.add(msg);
-							//adapter.notifyItemInserted(messages.size() - 1);
-							et.setText("");
 						}
 					})
 					.addOnFailureListener(new OnFailureListener() {
@@ -129,6 +126,8 @@ public class UserChats extends AppCompatActivity {
 							Toast.makeText(UserChats.this, "Failed to post msg", Toast.LENGTH_LONG).show();
 						}
 					});
+
+			et.setText("");
 		});
 	}
 
