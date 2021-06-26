@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -150,11 +151,13 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 	@Override
 	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 		if (item.getItemId() == R.id.logout) {
-			mAuth.signOut();
+			FirebaseAuth.getInstance().signOut();
 			startActivity(new Intent(ChatsDashboardActivity.this, LoginActivity.class));
 			finish();
+			Log.e("logout check", "logout pass");
 			return true;
 		}
+		Log.e("logout check", "logout failed");
 		return false;
 	}
 }
