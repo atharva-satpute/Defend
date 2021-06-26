@@ -1,5 +1,6 @@
 package com.app.defend.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,13 +33,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.w3c.dom.Text;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -68,7 +73,7 @@ public class UserChats extends AppCompatActivity {
 		db = FirebaseFirestore.getInstance();
 		ll = findViewById(R.id.rvChat);
 		messages = new ArrayList<>();
-		adapter = new Adapter();
+		adapter = new Adapter(Utils.getUID(this));
 		et = findViewById(R.id.etMessage);
 		send = findViewById(R.id.btnSend);
 
@@ -95,15 +100,8 @@ public class UserChats extends AppCompatActivity {
 
 			try {
 				typedMsg = Base64.getEncoder().encodeToString(RSAUtils.encrypt(typedMsg, receiver.getPublicKey()));
-			} catch (BadPaddingException e) {
-				e.printStackTrace();
-			} catch (IllegalBlockSizeException e) {
-				e.printStackTrace();
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-			} catch (NoSuchPaddingException e) {
-				e.printStackTrace();
-			} catch (NoSuchAlgorithmException e) {
+			} catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchPaddingException |
+					NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}
 
@@ -195,50 +193,110 @@ public class UserChats extends AppCompatActivity {
 
 	}
 
-	public class TextViewHolder extends RecyclerView.ViewHolder {
+	public abstract class TextViewHolder extends RecyclerView.ViewHolder {
 
 		TextView tv;
 
 		public TextViewHolder(@NonNull View itemView) {
 			super(itemView);
-			tv = itemView.findViewById(R.id.chattv);
+//			tv = itemView.findViewById(R.id.chattv);
 		}
+		abstract void bindMessage(Message message);
 	}
 
 	public class Adapter extends RecyclerView.Adapter<TextViewHolder> {
 
+		private static final int MESSAGE_OUTGOING = 123;
+		private static final int MESSAGE_INCOMING = 321;
+		String mUserId;
+
+		public Adapter(String userId) {
+			this.mUserId = userId;
+		}
+
+
 		@NonNull
 		@Override
 		public TextViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(UserChats.this).inflate(R.layout.chattvitem, parent, false);
-			return new TextViewHolder(v);
+			Context context = parent.getContext();
+			LayoutInflater inflater = LayoutInflater.from(context);
+
+			if (viewType == MESSAGE_INCOMING) {
+				View view = inflater.inflate(R.layout.receiver_msg_chat, parent, false);
+				return new IncomingMessageViewHolder(view);
+			} else if (viewType == MESSAGE_OUTGOING) {
+				View view = inflater.inflate(R.layout.sender_msg_chat, parent, false);
+				return new OutgoingMessageViewHolder(view);
+			} else {
+				throw new IllegalArgumentException("Unknown view type");
+			}
+		}
+
+		private boolean isMe(int position) {
+			Message message = messages.get(position);
+			return message.getUID() != null && message.getFrom().equals(mUserId);
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+			if (isMe(position)) {
+				return MESSAGE_OUTGOING;
+			} else {
+				return MESSAGE_INCOMING;
+			}
 		}
 
 		@RequiresApi(api = Build.VERSION_CODES.O)
 		@Override
 		public void onBindViewHolder(@NonNull TextViewHolder holder, int position) {
-			if (messages.get(position).getTo().equals(Utils.getUID(UserChats.this))) {
-				try {
-					holder.tv.setText(RSAUtils.decrypt(messages.get(position).getEncryptedText(), Utils.getPrivateKey(UserChats.this)));
-				} catch (IllegalBlockSizeException e) {
-					e.printStackTrace();
-				} catch (InvalidKeyException e) {
-					e.printStackTrace();
-				} catch (BadPaddingException e) {
-					e.printStackTrace();
-				} catch (NoSuchAlgorithmException e) {
-					e.printStackTrace();
-				} catch (NoSuchPaddingException e) {
-					e.printStackTrace();
-				}
-			} else {
-				holder.tv.setText(Utils.getMessage(messages.get(position).getUID(), UserChats.this));
-			}
+			Message message = messages.get(position);
+			holder.bindMessage(message);
 		}
 
 		@Override
 		public int getItemCount() {
 			return messages.size();
+		}
+	}
+
+	public class IncomingMessageViewHolder extends TextViewHolder {
+		TextView textMessage;
+		TextView chatTime;
+
+		public IncomingMessageViewHolder(@NonNull View itemView) {
+			super(itemView);
+			textMessage = itemView.findViewById(R.id.receiver_chat);
+			chatTime = itemView.findViewById(R.id.chat_timestamp_receiver);
+		}
+
+		@RequiresApi(api = Build.VERSION_CODES.O)
+		@Override
+		void bindMessage(Message message) {
+			try {
+				textMessage.setText(RSAUtils.decrypt(message.getEncryptedText(),Utils.getPrivateKey(UserChats.this)));
+				SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+				chatTime.setText(sdf.format(message.getDate()));
+			} catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException |
+					NoSuchPaddingException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public class OutgoingMessageViewHolder extends TextViewHolder {
+		TextView textMessage;
+		TextView chatTime;
+		public OutgoingMessageViewHolder(@NonNull View itemView) {
+			super(itemView);
+			textMessage = itemView.findViewById(R.id.sender_chat);
+			chatTime = itemView.findViewById(R.id.chat_timestamp_sender);
+		}
+
+		@Override
+		void bindMessage(Message message) {
+			textMessage.setText(Utils.getMessage(message.getUID(),UserChats.this));
+			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+			chatTime.setText(sdf.format(message.getDate()));
 		}
 	}
 
