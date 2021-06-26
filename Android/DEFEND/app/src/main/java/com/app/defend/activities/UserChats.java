@@ -3,7 +3,6 @@ package com.app.defend.activities;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,9 +90,7 @@ public class UserChats extends AppCompatActivity {
 
 			try {
 				typedMsg = Base64.getEncoder().encodeToString(com.app.defend.rsa.Utils.encrypt(typedMsg, receiver.getPublicKey()));
-				Log.e("123", "inside send" + typedMsg);
 			} catch (BadPaddingException e) {
-				Log.e("123", "inside send" + typedMsg);
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
 				e.printStackTrace();
@@ -105,13 +102,10 @@ public class UserChats extends AppCompatActivity {
 				e.printStackTrace();
 			}
 
-
 			Message msg = new Message();
 
 			msg.setUID(Utils.getAlphaNumericString(20));
 			msg.setDate(new Date());
-
-			Log.e("123", "encrypted" + typedMsg);
 			msg.setEncryptedText(typedMsg);
 
 			msg.setFrom(Utils.getUID(this));
@@ -164,7 +158,6 @@ public class UserChats extends AppCompatActivity {
 	private void retrieveMessages() {
 		uids.add(receiver.getUID());
 		uids.add(Utils.getUID(this));
-		Log.e("123", uids.get(0) + "####" + uids.get(1));
 		Collections.sort(uids);
 
 		db.collection(uids.get(0) + uids.get(1)).get()
@@ -248,6 +241,5 @@ public class UserChats extends AppCompatActivity {
 			return messages.size();
 		}
 	}
-
 
 }

@@ -1,9 +1,11 @@
 package com.app.defend.rsa;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -37,10 +39,11 @@ public class Utils {
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
-	public static byte[] encrypt(String data, String base6PpublicKey) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
-		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(base6PpublicKey));
-		return cipher.doFinal(data.getBytes());
+	public static byte[] encrypt(String data, String base64PublicKey) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+		Cipher cipher = Cipher.getInstance("RSA");
+		cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(base64PublicKey));
+		Log.e("123", "karra kaam");
+		return cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
