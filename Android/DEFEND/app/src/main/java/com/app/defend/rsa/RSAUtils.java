@@ -21,7 +21,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class Utils {
+public class RSAUtils {
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public static PublicKey getPublicKey(String base64PublicKey) {
 		PublicKey publicKey = null;
@@ -70,7 +70,7 @@ public class Utils {
 	}
 
 	public static String decrypt(byte[] data, PrivateKey privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		Cipher cipher = Cipher.getInstance("RSA");
 		cipher.init(Cipher.DECRYPT_MODE, privateKey);
 		return new String(cipher.doFinal(data));
 	}

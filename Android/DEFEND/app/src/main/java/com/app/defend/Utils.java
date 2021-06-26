@@ -78,4 +78,11 @@ public class Utils {
 		return sp.getString(UID, "");
 	}
 
+	public static void putMessage(String UID, String msg, Context context) {
+		SharedPreferences sp = context.getSharedPreferences("messages", Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		editor.putString(UID, msg);
+		editor.apply();
+	}
+
 }

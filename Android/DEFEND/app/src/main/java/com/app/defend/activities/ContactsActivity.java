@@ -155,7 +155,6 @@ public class ContactsActivity extends AppCompatActivity {
 		}
 	}
 
-	// TO implement on click on the list item
 	static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
 		private ClickListener clicklistener;

@@ -23,6 +23,7 @@ import com.app.defend.R;
 import com.app.defend.Utils;
 import com.app.defend.model.Message;
 import com.app.defend.model.User;
+import com.app.defend.rsa.RSAUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -86,10 +87,14 @@ public class UserChats extends AppCompatActivity {
 		retriveUser(phoneNumber);
 		send.setOnClickListener(v -> {
 
+			Message msg = new Message();
+			msg.setUID(Utils.getAlphaNumericString(20));
 			String typedMsg = et.getText().toString();
 
+			Utils.putMessage(msg.getUID(), typedMsg, this);
+
 			try {
-				typedMsg = Base64.getEncoder().encodeToString(com.app.defend.rsa.Utils.encrypt(typedMsg, receiver.getPublicKey()));
+				typedMsg = Base64.getEncoder().encodeToString(RSAUtils.encrypt(typedMsg, receiver.getPublicKey()));
 			} catch (BadPaddingException e) {
 				e.printStackTrace();
 			} catch (IllegalBlockSizeException e) {
@@ -102,9 +107,6 @@ public class UserChats extends AppCompatActivity {
 				e.printStackTrace();
 			}
 
-			Message msg = new Message();
-
-			msg.setUID(Utils.getAlphaNumericString(20));
 			msg.setDate(new Date());
 			msg.setEncryptedText(typedMsg);
 
@@ -217,9 +219,9 @@ public class UserChats extends AppCompatActivity {
 		@RequiresApi(api = Build.VERSION_CODES.O)
 		@Override
 		public void onBindViewHolder(@NonNull TextViewHolder holder, int position) {
-			if (messages.get(position).getTo() == Utils.getUID(UserChats.this)) {
+			if (messages.get(position).getTo().equals(Utils.getUID(UserChats.this))) {
 				try {
-					holder.tv.setText(com.app.defend.rsa.Utils.decrypt(messages.get(position).getEncryptedText(), Utils.getPrivateKey(UserChats.this)));
+					holder.tv.setText(RSAUtils.decrypt(messages.get(position).getEncryptedText(), Utils.getPrivateKey(UserChats.this)));
 				} catch (IllegalBlockSizeException e) {
 					e.printStackTrace();
 				} catch (InvalidKeyException e) {
