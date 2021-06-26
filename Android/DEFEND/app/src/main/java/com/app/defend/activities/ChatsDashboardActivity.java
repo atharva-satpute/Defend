@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -47,13 +48,26 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 
 		fab.setOnClickListener(v -> {
 
-			getExternalStoragePermission();
-			if (storagePermissionGranted) {
-				Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
-				startActivity(i);
-			}
+//			getExternalStoragePermission();
+
+
+				// Check the SDK version and whether the permission is already granted or not.
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+					requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+					//After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+				} else {
+					// Android version is lesser than 6.0 or the permission is already granted.
+					Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
+					startActivity(i);
+				}
+
+//			if (storagePermissionGranted) {
+//				Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
+//				startActivity(i);
+//			}
 		});
 	}
+
 
 	private void retrieveMessages() {
 		FirebaseFirestore.getInstance().collection("Users").document("Messages").collection("Messages").get()
