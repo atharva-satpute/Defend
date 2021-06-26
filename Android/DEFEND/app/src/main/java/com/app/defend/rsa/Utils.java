@@ -37,9 +37,9 @@ public class Utils {
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
-	public static byte[] encrypt(String data, String publicKey) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+	public static byte[] encrypt(String data, String base6PpublicKey) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
 		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(publicKey));
+		cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(base6PpublicKey));
 		return cipher.doFinal(data.getBytes());
 	}
 

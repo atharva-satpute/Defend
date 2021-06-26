@@ -3,6 +3,8 @@ package com.app.defend;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.app.defend.model.User;
+
 public class Utils {
 
 	public static String getAlphaNumericString(int n) {
@@ -33,6 +35,32 @@ public class Utils {
 		edit.apply();
 	}
 
+	public static void saveUserToSP(User user, Context context) {
+		SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+		SharedPreferences.Editor edit = sp.edit();
+		edit.putString("name", user.getName());
+		edit.putString("phoneNo", user.getPhoneNo());
+		edit.putString("UID", user.getUID());
+
+		edit.apply();
+
+	}
+
+	public static String getUID(Context context) {
+		SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+		return sp.getString("UID", null);
+	}
+
+	public static String getPhone(Context context) {
+		SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+		return sp.getString("phoneNo", null);
+	}
+
+	public static String getName(Context context) {
+		SharedPreferences sp = context.getSharedPreferences("data", Context.MODE_PRIVATE);
+		return sp.getString("name", null);
+	}
+
 	public static String getPrivateKey(Context context) {
 		SharedPreferences sp = context.getSharedPreferences("configs", Context.MODE_PRIVATE);
 		String privateKey = sp.getString("privateKey", null);
@@ -43,6 +71,11 @@ public class Utils {
 		SharedPreferences sp = context.getSharedPreferences("configs", Context.MODE_PRIVATE);
 		String publicKey = sp.getString("publicKey", null);
 		return publicKey;
+	}
+
+	public static String getMessage(String UID, Context context) {
+		SharedPreferences sp = context.getSharedPreferences("messages", Context.MODE_PRIVATE);
+		return sp.getString(UID, "");
 	}
 
 }

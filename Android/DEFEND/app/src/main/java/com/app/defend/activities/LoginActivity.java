@@ -22,7 +22,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -49,8 +48,9 @@ public class LoginActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_login);
 		mAuth = FirebaseAuth.getInstance();
 
-		FirebaseUser user = mAuth.getCurrentUser();
-		if (user != null) {
+		//FirebaseUser user = mAuth.getCurrentUser();
+		//if (user != null) {
+		if (Utils.getPrivateKey(this) != null) {
 			Intent i = new Intent(this, ChatsDashboardActivity.class);
 			startActivity(i);
 			finish();
@@ -59,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
 		phoneno = findViewById(R.id.phoneno);
 		verify = findViewById(R.id.verify);
 		otp = findViewById(R.id.otp);
-
 
 
 		verify.setOnClickListener(v -> {
@@ -173,6 +172,7 @@ public class LoginActivity extends AppCompatActivity {
 		user.setName("Omkar");
 		user.setPhoneNo(phoneno.getEditText().getText().toString());
 		user.setPublicKey(publicKey);
+		Utils.saveUserToSP(user, this);
 
 		FirebaseFirestore db = FirebaseFirestore.getInstance();
 		db.collection("Users").document(user.getUID()).set(user)
@@ -184,10 +184,10 @@ public class LoginActivity extends AppCompatActivity {
 						finish();
 					}
 				}).addOnFailureListener(new OnFailureListener() {
-					@Override
-					public void onFailure(@NonNull Exception e) {
-						Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-					}
-				});
+			@Override
+			public void onFailure(@NonNull Exception e) {
+				Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 }

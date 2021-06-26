@@ -1,10 +1,11 @@
 package com.app.defend.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class User {
+
 	String UID, name, phoneNo, publicKey;
-	ArrayList<String> transactions;
 	int reportCount;
 
 	public String getUID() {
@@ -37,14 +38,6 @@ public class User {
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
-	}
-
-	public ArrayList<String> getTransactions() {
-		return transactions;
-	}
-
-	public void setTransactions(ArrayList<String> transactions) {
-		this.transactions = transactions;
 	}
 
 	public int getReportCount() {

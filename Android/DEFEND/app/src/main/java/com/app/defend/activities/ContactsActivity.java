@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +36,6 @@ public class ContactsActivity extends AppCompatActivity {
 	ProgressBar pbar;
 	ContactsAdapter adapter;
 
-	public static interface ClickListener {
-		public void onClick(View view, int position);
-		public void onLongClick(View view, int position);
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,7 +48,6 @@ public class ContactsActivity extends AppCompatActivity {
 		pbar = findViewById(R.id.contactProgressBar);
 
 		getPhoneNumbers();
-		retrieveUsers();
 
 
 		rv.addOnItemTouchListener(new RecyclerTouchListener(this, rv, new ClickListener() {
@@ -100,6 +92,7 @@ public class ContactsActivity extends AppCompatActivity {
 						userContacts.add(doc.getString("phoneNo"));
 				}
 				updateUI();
+
 			}
 		}).addOnFailureListener(new OnFailureListener() {
 			@Override
@@ -135,7 +128,21 @@ public class ContactsActivity extends AppCompatActivity {
 
 		}
 		phones.close();
+		retrieveUsers();
 
+	}
+
+	// On Pressing the navigation up (back button)
+	@Override
+	public boolean onSupportNavigateUp() {
+		onBackPressed();
+		return true;
+	}
+
+	public static interface ClickListener {
+		public void onClick(View view, int position);
+
+		public void onLongClick(View view, int position);
 	}
 
 	public static class ContactViewHolder extends RecyclerView.ViewHolder {
@@ -148,37 +155,15 @@ public class ContactsActivity extends AppCompatActivity {
 		}
 	}
 
-	public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
-
-		@NonNull
-		@Override
-		public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(ContactsActivity.this).inflate(R.layout.contacts_list_item, parent, false);
-			return new ContactViewHolder(v);
-		}
-
-		@Override
-		public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-			holder.phone.setText(userContacts.get(position));
-			int idx = _phones.indexOf("+91"+userContacts.get(position));
-			holder.name.setText(_names.get(idx));
-		}
-
-		@Override
-		public int getItemCount() {
-			return userContacts.size();
-		}
-	}
-
 	// TO implement on click on the list item
 	static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
 		private ClickListener clicklistener;
 		private GestureDetector gestureDetector;
 
-		public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener){
+		public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
 			this.clicklistener = clickListener;
-			gestureDetector = new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
+			gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 				@Override
 				public boolean onSingleTapUp(MotionEvent e) {
 					return true;
@@ -186,18 +171,19 @@ public class ContactsActivity extends AppCompatActivity {
 
 				@Override
 				public void onLongPress(MotionEvent e) {
-					View child = recyclerView.findChildViewUnder(e.getX(),e.getY());
-					if(child != null && clickListener != null){
-						clickListener.onLongClick(child,recyclerView.getChildAdapterPosition(child));
+					View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+					if (child != null && clickListener != null) {
+						clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
 					}
 				}
 			});
 		}
+
 		@Override
 		public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-			View child = rv.findChildViewUnder(e.getX(),e.getY());
-			if(child != null && clicklistener != null && gestureDetector.onTouchEvent(e)){
-				clicklistener.onClick(child,rv.getChildAdapterPosition(child));
+			View child = rv.findChildViewUnder(e.getX(), e.getY());
+			if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e)) {
+				clicklistener.onClick(child, rv.getChildAdapterPosition(child));
 			}
 			return false;
 		}
@@ -213,10 +199,25 @@ public class ContactsActivity extends AppCompatActivity {
 		}
 	}
 
-	// On Pressing the navigation up (back button)
-	@Override
-	public boolean onSupportNavigateUp() {
-		onBackPressed();
-		return true;
+	public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
+
+		@NonNull
+		@Override
+		public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+			View v = LayoutInflater.from(ContactsActivity.this).inflate(R.layout.contacts_list_item, parent, false);
+			return new ContactViewHolder(v);
+		}
+
+		@Override
+		public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
+			holder.phone.setText(userContacts.get(position));
+			int idx = _phones.indexOf("+91" + userContacts.get(position));
+			holder.name.setText(_names.get(idx));
+		}
+
+		@Override
+		public int getItemCount() {
+			return userContacts.size();
+		}
 	}
 }
