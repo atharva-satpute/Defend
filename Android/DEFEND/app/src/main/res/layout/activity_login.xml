@@ -74,6 +74,7 @@
             android:textSize="30sp">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPhoneNo"
                 android:maxLength="10"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -100,7 +101,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/verify"
-        android:enabled="true"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

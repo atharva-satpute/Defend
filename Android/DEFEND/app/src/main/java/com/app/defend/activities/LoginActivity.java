@@ -3,7 +3,9 @@ package com.app.defend.activities;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -19,6 +21,7 @@ import com.app.defend.rsa.RSAKeyPairGenerator;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class LoginActivity extends AppCompatActivity {
 
 	TextInputLayout phoneno, otp;
+	TextInputEditText textPhoneNo;
 	MaterialButton verify;
 	FirebaseAuth mAuth;
 	PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
@@ -48,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_login);
 		mAuth = FirebaseAuth.getInstance();
 
+
 		//FirebaseUser user = mAuth.getCurrentUser();
 		//if (user != null) {
 		if (Utils.getPrivateKey(this) != null) {
@@ -59,6 +64,24 @@ public class LoginActivity extends AppCompatActivity {
 		phoneno = findViewById(R.id.phoneno);
 		verify = findViewById(R.id.verify);
 		otp = findViewById(R.id.otp);
+		textPhoneNo = findViewById(R.id.editTextPhoneNo);
+
+		textPhoneNo.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				verify.setEnabled(s.length() == 10);
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+
+			}
+		});
 
 
 		verify.setOnClickListener(v -> {
