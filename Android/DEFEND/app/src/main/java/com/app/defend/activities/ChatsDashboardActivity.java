@@ -148,16 +148,16 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 		return true;
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-		if (item.getItemId() == R.id.logout) {
-			FirebaseAuth.getInstance().signOut();
-			startActivity(new Intent(ChatsDashboardActivity.this, LoginActivity.class));
-			finish();
-			Log.e("logout check", "logout pass");
-			return true;
-		}
-		Log.e("logout check", "logout failed");
-		return false;
-	}
+//	@Override
+//	public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//		if (item.getItemId() == R.id.logout) {
+//			FirebaseAuth.getInstance().signOut();
+//			startActivity(new Intent(ChatsDashboardActivity.this, LoginActivity.class));
+//			finish();
+//			Log.e("logout check", "logout pass");
+//			return true;
+//		}
+//		Log.e("logout check", "logout failed");
+//		return false;
+//	}
 }
