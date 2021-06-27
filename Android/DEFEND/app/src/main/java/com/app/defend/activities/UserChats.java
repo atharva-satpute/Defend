@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -122,9 +125,29 @@ public class UserChats extends AppCompatActivity {
 		actionBar.setDisplayShowCustomEnabled(true);
 		View view = actionBar.getCustomView();
 		TextView rName = view.findViewById(R.id.receiverUserName);
-		rName.setText(phoneNumber);
+		rName.setText(receiverName);
 
 		retriveUser(phoneNumber);
+		et.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				if(charSequence.length() > 0){
+					send.setEnabled(true);
+				}
+				else {
+					send.setEnabled(false);
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+			}
+		});
+
 		send.setOnClickListener(v -> {
 			Log.e("123", "send ");
 			Message msg = new Message();
@@ -282,6 +305,8 @@ public class UserChats extends AppCompatActivity {
 		uids.add(receiver.getUID());
 		uids.add(Utils.getUID(this));
 		Collections.sort(uids);
+		Log.e("user1", uids.get(0));
+		Log.e("user2", uids.get(1));
 
 		db.collection(uids.get(0) + uids.get(1)).get()
 				.addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -293,7 +318,11 @@ public class UserChats extends AppCompatActivity {
 						}
 						adapter.notifyDataSetChanged();
 						setUpListeners();
+
+						db.collection("Users").document(Utils.getUID(UserChats.this)).update("chats", FieldValue.arrayUnion(receiver.getUID()));
+
 					}
+
 				}).addOnFailureListener(new OnFailureListener() {
 			@Override
 			public void onFailure(@NonNull Exception e) {
@@ -322,7 +351,7 @@ public class UserChats extends AppCompatActivity {
 
 	}
 
-	public abstract class TextViewHolder extends RecyclerView.ViewHolder {
+	public abstract static class TextViewHolder extends RecyclerView.ViewHolder {
 
 		TextView tv;
 
