@@ -4,6 +4,7 @@ public class Transaction {
 	String UID, fromUID, toUID, msgUID;
 	boolean sent, delivered, read;
 
+
 	public String getUID() {
 		return UID;
 	}

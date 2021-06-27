@@ -2,8 +2,10 @@ package com.app.defend.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.defend.R;
 import com.app.defend.Utils;
+import com.app.defend.ml.Nmodel;
 import com.app.defend.model.Message;
 import com.app.defend.model.User;
+import com.app.defend.retrofit.RetroInterface;
+import com.app.defend.retrofit.Retrofi;
 import com.app.defend.rsa.RSAUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,19 +38,32 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserChats extends AppCompatActivity {
 
@@ -57,6 +75,10 @@ public class UserChats extends AppCompatActivity {
 	Adapter adapter;
 	EditText et;
 	ImageButton send;
+	RetroInterface ri;
+	HashMap<String, Integer> mp;
+	Nmodel model = null;
+	TensorBuffer inputFeature0;
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
@@ -64,6 +86,18 @@ public class UserChats extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_chats);
 		uids = new ArrayList<>();
+
+		try {
+			model = Nmodel.newInstance(this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 10}, DataType.FLOAT32);
+
+		loadTokens();
+
+		ri = Retrofi.init().create(RetroInterface.class);
+
 
 		Intent intent = getIntent();
 		String receiverName = intent.getStringExtra("receiver_name");
@@ -92,15 +126,15 @@ public class UserChats extends AppCompatActivity {
 
 		retriveUser(phoneNumber);
 		send.setOnClickListener(v -> {
-
+			Log.e("123", "send ");
 			Message msg = new Message();
 			msg.setUID(Utils.getAlphaNumericString(20));
-			String typedMsg = et.getText().toString();
+			String origtypedMsg = et.getText().toString();
 
-			Utils.putMessage(msg.getUID(), typedMsg, this);
-
+			Utils.putMessage(msg.getUID(), origtypedMsg, this);
+			String typedMsg = null;
 			try {
-				typedMsg = Base64.getEncoder().encodeToString(RSAUtils.encrypt(typedMsg, receiver.getPublicKey()));
+				typedMsg = Base64.getEncoder().encodeToString(RSAUtils.encrypt(origtypedMsg, receiver.getPublicKey()));
 			} catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException | NoSuchPaddingException |
 					NoSuchAlgorithmException e) {
 				e.printStackTrace();
@@ -112,22 +146,112 @@ public class UserChats extends AppCompatActivity {
 			msg.setFrom(Utils.getUID(this));
 			msg.setTo(receiver.getUID());
 
-			db.collection(uids.get(0) + uids.get(1)).document(msg.getUID())
-					.set(msg)
-					.addOnSuccessListener(new OnSuccessListener<Void>() {
-						@Override
-						public void onSuccess(Void aVoid) {
-						}
-					})
-					.addOnFailureListener(new OnFailureListener() {
-						@Override
-						public void onFailure(@NonNull Exception e) {
-							Toast.makeText(UserChats.this, "Failed to post msg", Toast.LENGTH_LONG).show();
-						}
-					});
 
-			et.setText("");
+			int[][] tokensarray = preprocessText(origtypedMsg);
+			msg.setEncodings(inferModel(tokensarray));
+
+			getFlagsAndPost(msg);
 		});
+	}
+
+	private void getFlagsAndPost(Message msg) {
+
+		Call<String> call = ri.get_flags(msg.getEncodings());
+		call.enqueue(new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				if (response.isSuccessful()) {
+					Log.e("123", "response success");
+					String[] _t = response.body().split(" ");
+					ArrayList<String> flags = new ArrayList<>();
+					Collections.addAll(flags, _t);
+					msg.setFlags(flags);
+
+					postMessage(msg);
+
+				} else {
+					Toast.makeText(UserChats.this, "Failed to post msg", Toast.LENGTH_LONG).show();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+
+			}
+		});
+
+
+	}
+
+	private void postMessage(Message msg) {
+		db.collection(uids.get(0) + uids.get(1)).document(msg.getUID())
+				.set(msg)
+				.addOnSuccessListener(new OnSuccessListener<Void>() {
+					@Override
+					public void onSuccess(Void aVoid) {
+					}
+				})
+				.addOnFailureListener(new OnFailureListener() {
+					@Override
+					public void onFailure(@NonNull Exception e) {
+						Toast.makeText(UserChats.this, "Failed to post msg", Toast.LENGTH_LONG).show();
+					}
+				});
+
+		et.setText("");
+	}
+
+	private String inferModel(int[][] tokensarray) {
+
+		inputFeature0.loadArray(tokensarray[0]);
+		Nmodel.Outputs outputs = model.process(inputFeature0);
+		TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+		Log.e("123", "inferred");
+		return Arrays.toString(outputFeature0.getFloatArray());
+
+	}
+
+	private void loadTokens() {
+		AssetManager am = getAssets();
+		InputStream is = null;
+		try {
+			is = am.open("mapping.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mp = new HashMap<>();
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String read;
+		while (true) {
+			try {
+				if (((read = br.readLine()) == null)) break;
+				String[] arr = read.split(" ");
+				mp.put(arr[0], Integer.parseInt(arr[1]));
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	private int[][] preprocessText(String origtypedMsg) {
+
+		String[] tokens = origtypedMsg.split(" ");
+		int[][] a = new int[1][10];
+
+		for (int i = 0; i < tokens.length; i++) {
+			if (mp.get(tokens[i]) == null)
+				a[0][i] = 0;
+			else a[0][i] = mp.get(tokens[i]);
+		}
+
+		for (int i = tokens.length; i < 10; i++)
+			a[0][i] = 0;
+
+		Log.e("123", "prepocessed");
+		return a;
 	}
 
 	@Override

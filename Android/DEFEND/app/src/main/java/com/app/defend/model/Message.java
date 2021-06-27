@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class Message implements Comparable<Message> {
 	String UID, encryptedText, encodings, to, from;
-	ArrayList<Integer> flags;
+	ArrayList<String> flags;
 	Date date;
 
 	public String getTo() {
@@ -56,11 +56,11 @@ public class Message implements Comparable<Message> {
 		this.encodings = encodings;
 	}
 
-	public ArrayList<Integer> getFlags() {
+	public ArrayList<String> getFlags() {
 		return flags;
 	}
 
-	public void setFlags(ArrayList<Integer> flags) {
+	public void setFlags(ArrayList<String> flags) {
 		this.flags = flags;
 	}
 
