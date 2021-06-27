@@ -36,8 +36,6 @@ public class ContactsActivity extends AppCompatActivity {
 	ProgressBar pbar;
 	ContactsAdapter adapter;
 
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

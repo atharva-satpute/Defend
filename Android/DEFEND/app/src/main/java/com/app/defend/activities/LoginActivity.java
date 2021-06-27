@@ -92,7 +92,6 @@ public class LoginActivity extends AppCompatActivity {
 
 		verify.setOnClickListener(v -> {
 			if (!first) {
-				Log.e("123", "send otp");
 				if (TextUtils.isEmpty(phoneno.getEditText().getText().toString())) {
 					Toast.makeText(LoginActivity.this, "Please enter a valid phone number.", Toast.LENGTH_SHORT).show();
 				} else {

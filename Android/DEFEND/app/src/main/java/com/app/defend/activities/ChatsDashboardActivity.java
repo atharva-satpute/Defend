@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.defend.R;
@@ -52,6 +53,7 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 	FirebaseFirestore db;
 	RecyclerView rvchats;
 	ArrayList<String> chatUser;
+	ChatAdapter adapter;
 	private FirebaseAuth mAuth;
 	private boolean storagePermissionGranted;
 
@@ -63,7 +65,13 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 		mAuth = FirebaseAuth.getInstance();
 		fab = findViewById(R.id.newconversation);
 		rvchats = findViewById(R.id.rvChat);
+		chatUser = new ArrayList<>();
+		adapter = new ChatAdapter();
+		rvchats.setAdapter(adapter);
+		rvchats.setLayoutManager(new LinearLayoutManager(this));
+
 		db = FirebaseFirestore.getInstance();
+
 
 		getChatArray();
 		retrieveMessages();
