@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,9 +92,29 @@ public class UserChats extends AppCompatActivity {
 		actionBar.setDisplayShowCustomEnabled(true);
 		View view = actionBar.getCustomView();
 		TextView rName = view.findViewById(R.id.receiverUserName);
-		rName.setText(phoneNumber);
+		rName.setText(receiverName);
 
 		retriveUser(phoneNumber);
+		et.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				if(charSequence.length() > 0){
+					send.setEnabled(true);
+				}
+				else {
+					send.setEnabled(false);
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+			}
+		});
+		
 		send.setOnClickListener(v -> {
 
 			Message msg = new Message();
@@ -206,7 +228,7 @@ public class UserChats extends AppCompatActivity {
 
 	}
 
-	public abstract class TextViewHolder extends RecyclerView.ViewHolder {
+	public abstract static class TextViewHolder extends RecyclerView.ViewHolder {
 
 		TextView tv;
 
