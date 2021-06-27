@@ -1,6 +1,7 @@
 package com.app.defend.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,8 +10,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -20,21 +28,36 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.app.defend.R;
+import com.app.defend.Utils;
+import com.app.defend.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
+
+import java.util.ArrayList;
 
 public class ChatsDashboardActivity extends AppCompatActivity {
 
+	ArrayList<String> Uids;
+	ProgressBar pbar;
+//	ChatAdapter adapter;
+	User receiver;
+
 	private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 	FloatingActionButton fab;
+	FirebaseFirestore db;
 	RecyclerView rvchats;
 	private FirebaseAuth mAuth;
 	private boolean storagePermissionGranted;
+
+	ArrayList<String> chatUser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +67,14 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 		mAuth = FirebaseAuth.getInstance();
 		fab = findViewById(R.id.newconversation);
 		rvchats = findViewById(R.id.rvChat);
+		db = FirebaseFirestore.getInstance();
 
+		getChatArray();
 		retrieveMessages();
+
+//		chatUser = db.collection("Users").document(Utils.getUID(ChatsDashboardActivity.this)).get("");
+
+
 
 		fab.setOnClickListener(v -> {
 
@@ -84,6 +113,22 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 			public void onFailure(@NonNull Exception e) {
 
 			}
+		});
+	}
+
+	private void  getChatArray(){
+		db.collection("Users").document(Utils.getUID(ChatsDashboardActivity.this)).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+			@Override
+			public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+				if (task.isSuccessful()) {
+					DocumentSnapshot document = task.getResult();
+					if (document.exists()) {
+						chatUser = (ArrayList<String>) document.get("chats");
+						Log.d("list", chatUser.toString());
+					}
+				}
+			}
+
 		});
 	}
 
@@ -160,4 +205,93 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 //		Log.e("logout check", "logout failed");
 //		return false;
 //	}
+
+	// On Pressing the navigation up (back button)
+	@Override
+	public boolean onSupportNavigateUp() {
+		onBackPressed();
+		return true;
+	}
+
+	public static interface ClickListener {
+		public void onClick(View view, int position);
+
+		public void onLongClick(View view, int position);
+	}
+
+	public static class ChatViewHolder extends RecyclerView.ViewHolder {
+		TextView name;
+
+		public ChatViewHolder(@NonNull View itemView) {
+			super(itemView);
+			name = itemView.findViewById(R.id.name);
+//			phone = itemView.findViewById(R.id.phone);
+		}
+	}
+
+	static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+
+		private ClickListener clicklistener;
+		private GestureDetector gestureDetector;
+
+		public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
+			this.clicklistener = clickListener;
+			gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+				@Override
+				public boolean onSingleTapUp(MotionEvent e) {
+					return true;
+				}
+
+				@Override
+				public void onLongPress(MotionEvent e) {
+					View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+					if (child != null && clickListener != null) {
+						clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
+					}
+				}
+			});
+		}
+
+		@Override
+		public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+			View child = rv.findChildViewUnder(e.getX(), e.getY());
+			if (child != null && clicklistener != null && gestureDetector.onTouchEvent(e)) {
+				clicklistener.onClick(child, rv.getChildAdapterPosition(child));
+			}
+			return false;
+		}
+
+		@Override
+		public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+
+		}
+
+		@Override
+		public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+		}
+	}
+
+	public class ChatAdapter extends RecyclerView.Adapter<ChatViewHolder> {
+
+		@NonNull
+		@Override
+		public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+			View v = LayoutInflater.from(ChatsDashboardActivity.this).inflate(R.layout.activity_chats_dashboard, parent, false);
+			return new ChatViewHolder(v);
+		}
+
+		@Override
+		public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+			holder.name.setText(chatUser.get(position));
+
+//			holder.name.setText(_names.get(idx));
+		}
+
+		@Override
+		public int getItemCount() {
+			return chatUser.size();
+		}
+	}
+
 }
