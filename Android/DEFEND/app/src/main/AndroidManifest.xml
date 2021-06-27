@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DEFEND">
-        <activity android:name=".activities.OtpActivity"></activity>
+        <activity android:name=".activities.OtpActivity"/>
         <activity android:name=".activities.ContactsActivity" />
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
