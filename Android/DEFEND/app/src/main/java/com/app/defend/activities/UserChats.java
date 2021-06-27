@@ -82,6 +82,8 @@ public class UserChats extends AppCompatActivity {
 	HashMap<String, Integer> mp;
 	Nmodel model = null;
 	TensorBuffer inputFeature0;
+	Callback<String> callback;
+	Message msg;
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
@@ -89,6 +91,28 @@ public class UserChats extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_chats);
 		uids = new ArrayList<>();
+
+		callback = new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				if (response.isSuccessful()) {
+					Log.e("123", "response success");
+					String[] _t = response.body().split(" ");
+					ArrayList<String> flags = new ArrayList<>();
+					Collections.addAll(flags, _t);
+					msg.setFlags(flags);
+					postMessage(msg);
+				} else {
+					Toast.makeText(UserChats.this, "Failed to post msg" + response.errorBody() + response.message() + response.code(), Toast.LENGTH_LONG).show();
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+
+			}
+		};
+
 
 		try {
 			model = Nmodel.newInstance(this);
@@ -135,10 +159,9 @@ public class UserChats extends AppCompatActivity {
 
 			@Override
 			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-				if(charSequence.length() > 0){
+				if (charSequence.length() > 0) {
 					send.setEnabled(true);
-				}
-				else {
+				} else {
 					send.setEnabled(false);
 				}
 			}
@@ -150,7 +173,6 @@ public class UserChats extends AppCompatActivity {
 
 		send.setOnClickListener(v -> {
 			Log.e("123", "send ");
-			Message msg = new Message();
 			msg.setUID(Utils.getAlphaNumericString(20));
 			String origtypedMsg = et.getText().toString();
 
@@ -189,11 +211,9 @@ public class UserChats extends AppCompatActivity {
 					ArrayList<String> flags = new ArrayList<>();
 					Collections.addAll(flags, _t);
 					msg.setFlags(flags);
-
 					postMessage(msg);
-
 				} else {
-					Toast.makeText(UserChats.this, "Failed to post msg", Toast.LENGTH_LONG).show();
+					Toast.makeText(UserChats.this, "Failed to post msg" + response.errorBody() + response.message() + response.code(), Toast.LENGTH_LONG).show();
 				}
 			}
 
@@ -202,8 +222,6 @@ public class UserChats extends AppCompatActivity {
 
 			}
 		});
-
-
 	}
 
 	private void postMessage(Message msg) {

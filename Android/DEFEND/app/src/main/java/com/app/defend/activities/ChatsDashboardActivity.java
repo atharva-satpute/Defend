@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,25 +38,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 
 public class ChatsDashboardActivity extends AppCompatActivity {
 
+	private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 	ArrayList<String> Uids;
 	ProgressBar pbar;
-//	ChatAdapter adapter;
+	//	ChatAdapter adapter;
 	User receiver;
-
-	private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 	FloatingActionButton fab;
 	FirebaseFirestore db;
 	RecyclerView rvchats;
+	ArrayList<String> chatUser;
 	private FirebaseAuth mAuth;
 	private boolean storagePermissionGranted;
-
-	ArrayList<String> chatUser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,21 +71,20 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 //		chatUser = db.collection("Users").document(Utils.getUID(ChatsDashboardActivity.this)).get("");
 
 
-
 		fab.setOnClickListener(v -> {
 
 //			getExternalStoragePermission();
 
 
-				// Check the SDK version and whether the permission is already granted or not.
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-					requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-					//After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-				} else {
-					// Android version is lesser than 6.0 or the permission is already granted.
-					Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
-					startActivity(i);
-				}
+			// Check the SDK version and whether the permission is already granted or not.
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+				requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+				//After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
+			} else {
+				// Android version is lesser than 6.0 or the permission is already granted.
+				Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
+				startActivity(i);
+			}
 
 //			if (storagePermissionGranted) {
 //				Intent i = new Intent(ChatsDashboardActivity.this, ContactsActivity.class);
@@ -116,7 +111,7 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 		});
 	}
 
-	private void  getChatArray(){
+	private void getChatArray() {
 		db.collection("Users").document(Utils.getUID(ChatsDashboardActivity.this)).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
 			@Override
 			public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -277,14 +272,14 @@ public class ChatsDashboardActivity extends AppCompatActivity {
 		@NonNull
 		@Override
 		public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-			View v = LayoutInflater.from(ChatsDashboardActivity.this).inflate(R.layout.activity_chats_dashboard, parent, false);
+			View v = LayoutInflater.from(ChatsDashboardActivity.this).inflate(R.layout.dashboard_list_item, parent, false);
 			return new ChatViewHolder(v);
 		}
 
 		@Override
 		public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+			//holder.name.setText(chatUser.get(position));
 			holder.name.setText(chatUser.get(position));
-
 //			holder.name.setText(_names.get(idx));
 		}
 
