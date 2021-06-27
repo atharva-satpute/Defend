@@ -2,8 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="240dp"
     android:layout_height="wrap_content"
+    android:layout_gravity="start"
     android:layout_marginStart="8dp"
     android:layout_marginTop="16dp">
 
@@ -11,7 +12,6 @@
         android:id="@+id/card_receiver_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#eef1f6"
         app:cardCornerRadius="0dp"
         app:cardElevation="0dp"
         android:layout_marginStart="10dp"
@@ -20,27 +20,59 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp"
             android:background="@drawable/bg_receiver_chat_msg">
 
-            <TextView
-                android:id="@+id/receiver_chat"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/receiver_cl"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/receiver_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:maxWidth="240dp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:text="This is a Message"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:maxWidth="260dp"
-                android:paddingLeft="12dp"
-                android:paddingStart="12dp"
-                android:paddingTop="8dp"
-                android:paddingRight="12dp"
-                android:text="Message"
-                android:textColor="@color/white"
-                android:textSize="16sp"/>
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/receiver_cl"
+                android:visibility="gone">
 
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_baseline_report_24"/>
+                <TextView
+                    android:id="@+id/reportText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#ff0000"/>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -53,7 +85,5 @@
         android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="@+id/card_receiver_chat"
         app:layout_constraintStart_toEndOf="@+id/card_receiver_chat" />
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
