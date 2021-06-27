@@ -18,7 +18,7 @@ def get_flags():
     data = np.array(data).reshape((1, 10, 50))
     op = model.predict(data)
     op = op[0]
-    return jsonify(str(op[0])+str(op[1])+str(op[2])+str(op[3])+str(op[4])+str(op[5]))
+    return jsonify(str(op[0])+" "+ str(op[1])+" "+str(op[2])+" "+str(op[3])+" "+str(op[4])+" "+str(op[5]))
 
 if __name__ == '__main__':
-    app.run(host="192.168.0.103", port=5000)
+    app.run(host="192.168.1.8", port=5000)

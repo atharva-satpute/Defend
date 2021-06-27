@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
+        app:cardElevation="2dp"
         android:layout_marginEnd="10dp"
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
@@ -24,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="5dp"
+            android:layout_gravity="end"
             android:background="@drawable/bg_sender_msg_chat">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <TextView
                     android:id="@+id/sender_chat"
@@ -40,7 +41,7 @@
                     android:layout_marginBottom="8dp"
                     android:maxWidth="240dp"
                     android:padding="10dp"
-                    android:gravity="center"
+                    android:gravity="end"
                     android:text="This is a Message"
                     android:textColor="@color/white"
                     android:textSize="16sp"
